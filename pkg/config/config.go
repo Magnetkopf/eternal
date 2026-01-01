@@ -10,9 +10,8 @@ import (
 
 // ServiceConfig represents the configuration for a service
 type ServiceConfig struct {
-	Exec      string `yaml:"exec"`
-	Dir       string `yaml:"dir"`
-	AutoStart bool   `yaml:"autostart"` // Optional, inferred if needed
+	Exec string `yaml:"exec"`
+	Dir  string `yaml:"dir"`
 }
 
 // LoadConfig loads a service configuration from a YAML file

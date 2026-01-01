@@ -5,9 +5,7 @@ Eternal is a simple process manager for Linux.
 ## Building
 
 ```bash
-go build -o eternal ./cmd/eternal
-go build -o eternal-daemon ./cmd/eternal-daemon
-
+bash build.sh
 
 mv eternal eternal-daemon ~/.local/bin/
 # or
@@ -21,6 +19,11 @@ cat <<EOF > ~/.eternal/services/example.yaml
 exec: /bin/sleep 100
 dir: /tmp
 EOF
+
+# create service
+eternal new example
+# delete service
+eternal delete example
 
 # enable auto start
 eternal enable example
@@ -38,3 +41,10 @@ Services are stored in `~/.eternal/services/`, add a YAML file for each service.
 
 - `exec`: The command to run
 - `dir`: The directory to run the command in
+
+Example:
+
+```yaml
+exec: /bin/sleep 100
+dir: /tmp
+```

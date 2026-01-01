@@ -15,7 +15,7 @@ const socketPath = "/tmp/eternal.sock"
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Println("Usage: eternal [start|stop|status|enable|disable] <service_name>")
+		fmt.Println("Usage: eternal [start|stop|status|enable|disable|new|delete] <service_name>")
 		os.Exit(1)
 	}
 
@@ -35,6 +35,12 @@ func main() {
 		return
 	case "disable":
 		handleDisable(service)
+		return
+	case "new":
+		handleNew(service)
+		return
+	case "delete":
+		handleDelete(service)
 		return
 	default:
 		fmt.Printf("Unknown command: %s\n", cmd)
@@ -79,6 +85,69 @@ func handleDisable(service string) {
 		os.Exit(1)
 	}
 	fmt.Printf("Service %s disabled\n", service)
+}
+
+func handleNew(service string) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Printf("Failed to get user home: %v\n", err)
+		os.Exit(1)
+	}
+
+	servicesDir := filepath.Join(home, ".eternal", "services")
+	if err := os.MkdirAll(servicesDir, 0755); err != nil {
+		fmt.Printf("Failed to create services directory: %v\n", err)
+		os.Exit(1)
+	}
+
+	serviceFile := filepath.Join(servicesDir, service+".yaml")
+	if _, err := os.Stat(serviceFile); err == nil {
+		fmt.Printf("Service %s already exists at %s\n", service, serviceFile)
+		os.Exit(1)
+	}
+
+	defaultContent := `# Command to execute
+exec: ""
+# Working directory
+dir: ""
+`
+	if err := os.WriteFile(serviceFile, []byte(defaultContent), 0644); err != nil {
+		fmt.Printf("Failed to create service file: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("Service created. Edit config at: %s\n", serviceFile)
+}
+
+func handleDelete(service string) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Printf("Failed to get user home: %v\n", err)
+		os.Exit(1)
+	}
+
+	// 1. Check if service file exists
+	serviceFile := filepath.Join(home, ".eternal", "services", service+".yaml")
+	if _, err := os.Stat(serviceFile); os.IsNotExist(err) {
+		fmt.Printf("Service %s does not exist\n", service)
+		os.Exit(1)
+	}
+
+	// 2. Disable service if enabled
+	enabledFile := filepath.Join(home, ".eternal", "enabled.yaml")
+	// config.DisableService returns nil if service is not found in enabled list, which is what we want
+	if err := config.DisableService(enabledFile, service); err != nil {
+		fmt.Printf("Failed to disable service before deletion: %v\n", err)
+		os.Exit(1)
+	}
+
+	// 3. Delete service file
+	if err := os.Remove(serviceFile); err != nil {
+		fmt.Printf("Failed to delete service file: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("Service %s deleted\n", service)
 }
 
 func sendRequest(reqType ipc.RequestType, service string) {
