@@ -5,9 +5,11 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
+    
+permissions:
+  contents: write
+  
 jobs:
-
   build:
     runs-on: ubuntu-latest
     steps:
@@ -22,5 +24,16 @@ jobs:
       run: |
         go build -o eternal ./cmd/eternal
         go build -o eternal-daemon ./cmd/eternal-daemon
+        
+    - name: Compress
+      run: |
+        zip eternal-amd64.zip eternal eternal-daemon
+        
+    - name: Upload assets
+      uses: softprops/action-gh-release@v2
+      with:
+        files: eternal-amd64.zip
+        prerelease: true
+        tag_name: beta
 
 
