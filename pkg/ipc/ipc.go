@@ -13,7 +13,7 @@ const (
 // Request defines the structure of a command sent to the daemon
 type Request struct {
 	Type    RequestType `json:"type"`
-	Service string      `json:"service"` // Name of the service
+	Service string      `json:"service"`
 }
 
 // Response defines the structure of the reply from the daemon

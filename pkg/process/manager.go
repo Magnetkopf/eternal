@@ -89,7 +89,19 @@ func (m *Manager) StartService(name string) error {
 
 	proc, exists := m.processes[name]
 	if !exists {
-		return fmt.Errorf("service %s not found", name)
+		// Try to load it from disk if not found in memory
+		// This handles the case where a service file was created after daemon start
+		cfgPath := filepath.Join(m.servicesDir, name+".yaml")
+		cfg, err := config.LoadConfig(cfgPath)
+		if err != nil {
+			return fmt.Errorf("service %s not found (and failed to load config: %v)", name, err)
+		}
+
+		proc = &ManagedProcess{
+			Config: cfg,
+			Status: StatusStopped,
+		}
+		m.processes[name] = proc
 	}
 
 	if proc.Status == StatusRunning {
