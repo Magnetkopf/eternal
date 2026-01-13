@@ -132,6 +132,15 @@ func handleConnection(conn net.Conn, pm *process.Manager) {
 			resp.Success = true
 			resp.Message = string(status)
 		}
+	case ipc.RequestRestart:
+		err := pm.RestartService(req.Service)
+		if err != nil {
+			resp.Success = false
+			resp.Message = err.Error()
+		} else {
+			resp.Success = true
+			resp.Message = fmt.Sprintf("Service %s restarted", req.Service)
+		}
 	default:
 		resp.Success = false
 		resp.Message = "Unknown request type"

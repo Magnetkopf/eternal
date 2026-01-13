@@ -15,7 +15,7 @@ const socketPath = "/tmp/eternal.sock"
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Println("Usage: eternal [start|stop|status|enable|disable|new|delete] <service_name>")
+		fmt.Println("Usage: eternal [start|stop|restart|status|enable|disable|new|delete] <service_name>")
 		os.Exit(1)
 	}
 
@@ -30,6 +30,8 @@ func main() {
 		reqType = ipc.RequestStop
 	case "status":
 		reqType = ipc.RequestStatus
+	case "restart":
+		reqType = ipc.RequestRestart
 	case "enable":
 		handleEnable(service)
 		return

@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"time"
 
 	"eternal/pkg/config"
 )
@@ -192,4 +193,50 @@ func (m *Manager) GetStatus(name string) (ProcessStatus, error) {
 		return "", fmt.Errorf("service %s not found", name)
 	}
 	return proc.Status, nil
+}
+
+// RestartService restarts a service, or returns error if not running
+func (m *Manager) RestartService(name string) error {
+	m.mu.RLock()
+	proc, exists := m.processes[name]
+	m.mu.RUnlock()
+
+	if !exists {
+		return fmt.Errorf("service %s not found", name)
+	}
+
+	if proc.Status != StatusRunning {
+		return fmt.Errorf("not started")
+	}
+
+	if err := m.StopService(name); err != nil {
+		return fmt.Errorf("failed to stop: %w", err)
+	}
+
+	// Wait for the service to actually stop
+	for i := 0; i < 50; i++ {
+		status, err := m.GetStatus(name)
+		if err != nil {
+			return err
+		}
+		if status != StatusRunning {
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	// Double check
+	status, err := m.GetStatus(name)
+	if err != nil {
+		return err
+	}
+	if status == StatusRunning {
+		return fmt.Errorf("service failed to stop in time")
+	}
+
+	if err := m.StartService(name); err != nil {
+		return fmt.Errorf("failed to start: %w", err)
+	}
+
+	return nil
 }
