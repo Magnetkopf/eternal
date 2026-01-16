@@ -16,6 +16,11 @@ type ServiceConfig struct {
 	Dir  string `yaml:"dir"`
 }
 
+type SystemConfig struct {
+	Token   string `yaml:"token"`
+	APIPort int    `yaml:"api_port"`
+}
+
 // LoadConfig loads a service configuration from a YAML file
 func LoadConfig(path string) (*ServiceConfig, error) {
 	data, err := os.ReadFile(path)
@@ -144,43 +149,39 @@ func DeleteServiceConfig(path string) error {
 	return nil
 }
 
-// DaemonConfig represents global daemon configuration
-type DaemonConfig struct {
-	Token string `yaml:"token"`
-}
-
-// LoadOrGenerateToken loads the auth token from config or generates a new one
-func LoadOrGenerateToken(path string) (string, error) {
+func LoadOrGenerateSystemConfig(path string) (SystemConfig, error) {
 	// Try to read existing
 	data, err := os.ReadFile(path)
 	if err == nil {
-		var cfg DaemonConfig
-		if err := yaml.Unmarshal(data, &cfg); err == nil && cfg.Token != "" {
-			return cfg.Token, nil
+		// config exists
+		var cfg SystemConfig
+		if err := yaml.Unmarshal(data, &cfg); err == nil {
+
+			return cfg, nil
 		}
 	} else if !os.IsNotExist(err) {
-		return "", fmt.Errorf("failed to read config: %w", err)
+		return SystemConfig{}, fmt.Errorf("failed to read config: %w", err)
 	}
 
-	// Generate new token
+	// Generate new config
 	token := generateRandomString(20)
-	cfg := DaemonConfig{Token: token}
+	cfg := SystemConfig{Token: token, APIPort: 9093}
 
 	data, err = yaml.Marshal(cfg)
 	if err != nil {
-		return "", fmt.Errorf("failed to marshal config: %w", err)
+		return SystemConfig{}, fmt.Errorf("failed to marshal config: %w", err)
 	}
 
 	// Ensure directory exists
 	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
-		return "", fmt.Errorf("failed to create directory: %w", err)
+		return SystemConfig{}, fmt.Errorf("failed to create directory: %w", err)
 	}
 
 	if err := os.WriteFile(path, data, 0644); err != nil {
-		return "", fmt.Errorf("failed to write config: %w", err)
+		return SystemConfig{}, fmt.Errorf("failed to write config: %w", err)
 	}
 
-	return token, nil
+	return cfg, nil
 }
 
 func generateRandomString(n int) string {

@@ -10,7 +10,7 @@ import (
 	"github.com/Magnetkopf/Eternal/internal/process"
 )
 
-type APIResponse struct {
+type Response struct {
 	Code    int         `json:"code"`
 	Message string      `json:"message,omitempty"`
 	Error   string      `json:"error,omitempty"`
@@ -88,7 +88,7 @@ type handler struct {
 func (h *handler) respondJSON(w http.ResponseWriter, code int, message string, data interface{}, errStr string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	resp := APIResponse{
+	resp := Response{
 		Code: code,
 	}
 	if errStr != "" {
@@ -203,8 +203,6 @@ func (h *handler) handleAction(w http.ResponseWriter, r *http.Request) {
 	// For start/stop/restart, returning status is good.
 	status, _ := h.pm.GetStatus(name)
 
-
-
 	data := ProcessData{
 		Name:   name,
 		Status: string(status),
@@ -267,5 +265,3 @@ func (h *handler) handleDelete(w http.ResponseWriter, r *http.Request) {
 
 	h.respondSuccess(w, "service deleted", nil)
 }
-
-

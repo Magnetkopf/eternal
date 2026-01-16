@@ -17,7 +17,6 @@ import (
 )
 
 const socketPath = "/tmp/eternal.sock"
-const servicesDir = "./services"
 
 func main() {
 	// 1. Initialize Process Manager
@@ -82,14 +81,14 @@ func main() {
 
 	// Load Auth Token
 	configFile := filepath.Join(baseDir, "config.yaml")
-	authToken, err := config.LoadOrGenerateToken(configFile)
+	cfg, err := config.LoadOrGenerateSystemConfig(configFile)
 	if err != nil {
 		log.Fatalf("Failed to load auth token: %v", err)
 	}
-	log.Printf("Auth token: %s", authToken)
+	log.Printf("Auth token: %s", cfg.Token)
 
 	// Start API Server
-	go api.StartServer(pm, 9093, servicesDir, enabledFile, authToken)
+	go api.StartServer(pm, cfg.APIPort, servicesDir, enabledFile, cfg.Token)
 
 	// 4. Accept Connections
 	for {
