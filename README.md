@@ -41,9 +41,7 @@ eternal stop example
 
 ### API
 
-Server runs on `127.0.0.1:9093`
-
-Check `test/api_v1.sh` for API usage and testing.
+Check [api.md](docs/api.md) for API usage and testing.
 
 ## Configuration
 
