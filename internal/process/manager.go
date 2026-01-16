@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"eternal/internal/config"
+	"github.com/Magnetkopf/Eternal/internal/config"
 )
 
 // ProcessStatus represents the state of a process

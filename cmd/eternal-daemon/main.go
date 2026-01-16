@@ -10,10 +10,10 @@ import (
 	"path/filepath"
 	"syscall"
 
-	"eternal/internal/api"
-	"eternal/internal/config"
-	"eternal/internal/ipc"
-	"eternal/internal/process"
+	"github.com/Magnetkopf/Eternal/internal/api"
+	"github.com/Magnetkopf/Eternal/internal/config"
+	"github.com/Magnetkopf/Eternal/internal/ipc"
+	"github.com/Magnetkopf/Eternal/internal/process"
 )
 
 const socketPath = "/tmp/eternal.sock"

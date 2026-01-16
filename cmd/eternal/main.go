@@ -7,8 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"eternal/internal/config"
-	"eternal/internal/ipc"
+	"github.com/Magnetkopf/Eternal/internal/config"
+	"github.com/Magnetkopf/Eternal/internal/ipc"
 )
 
 const socketPath = "/tmp/eternal.sock"

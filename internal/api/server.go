@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"eternal/internal/config"
-	"eternal/internal/process"
+	"github.com/Magnetkopf/Eternal/internal/config"
+	"github.com/Magnetkopf/Eternal/internal/process"
 )
 
 type APIResponse struct {

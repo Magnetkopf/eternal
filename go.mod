@@ -1,4 +1,4 @@
-module eternal
+module github.com/Magnetkopf/Eternal
 
 go 1.25.4
 
