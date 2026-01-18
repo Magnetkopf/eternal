@@ -11,8 +11,6 @@ import (
 	"github.com/Magnetkopf/Eternal/internal/ipc"
 )
 
-const socketPath = "/tmp/eternal.sock"
-
 func main() {
 	if len(os.Args) < 3 {
 		fmt.Println("Usage: eternal [start|stop|restart|status|enable|disable|new|delete] <service_name>")
@@ -153,6 +151,13 @@ func handleDelete(service string) {
 }
 
 func sendRequest(reqType ipc.RequestType, service string) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Printf("Failed to get user home: %v\n", err)
+		os.Exit(1)
+	}
+	socketPath := filepath.Join(home, ".eternal", "eternal.sock")
+
 	conn, err := net.Dial("unix", socketPath)
 	if err != nil {
 		fmt.Printf("Failed to connect to daemon: %v\n", err)

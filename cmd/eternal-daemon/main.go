@@ -16,8 +16,6 @@ import (
 	"github.com/Magnetkopf/Eternal/internal/process"
 )
 
-const socketPath = "/tmp/eternal.sock"
-
 func main() {
 	// 1. Initialize Process Manager
 	home, err := os.UserHomeDir()
@@ -53,6 +51,7 @@ func main() {
 	}
 
 	// 2. Setup Socket
+	socketPath := filepath.Join(baseDir, "eternal.sock")
 	if err := os.RemoveAll(socketPath); err != nil {
 		log.Fatalf("Failed to remove old socket: %v", err)
 	}
